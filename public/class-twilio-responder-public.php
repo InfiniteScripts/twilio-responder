@@ -135,10 +135,16 @@ class twilio_responder_Public {
 		
 		$order = wc_get_order( $order_id );	
 		
-		$keyword1 = get_option('twilio_responder_keyword1_setting1');
-		$keyword2 = get_option('twilio_responder_keyword1_setting2');
-		$keyword3 = get_option('twilio_responder_keyword1_setting3');
+		if( strtolower($order->get_status()) == "delivered" || strtolower($order->get_status()) == "completed"){
+			$text = "Your order has already been shipped or delivered and no further changes can be made to this order's shipping.";
+			$this->send_twilio_text($phone, $text);
+			return 'Confirmation text sent';
+		}
 
+		$keyword1 = strtolower(get_option('twilio_responder_keyword1_setting'));
+		$keyword2 = strtolower(get_option('twilio_responder_keyword2_setting'));
+		$keyword3 = strtolower(get_option('twilio_responder_keyword3_setting'));
+	
 		if(str_contains($msg, $keyword1)){
 			/** Change order status to ready to ship (SMS Ship Today) **/         
 			$this->update_wc_status($order_id, 'wc-sms-ship-today');

@@ -56,7 +56,7 @@ class twilio_responder_Public {
 
 		/** Add Hourly Cron **/
 		if ( ! wp_next_scheduled( 'twilio_custom_cron' ) ) {
-		//	wp_schedule_event( time(), 'hourly', array($this, 'twilio_custom_cron' ) );
+			wp_schedule_event( time(), 'hourly', array($this, 'twilio_custom_cron' ) );
 		}
 
 		add_action( 'init', array($this, 'register_sms_order_status') );		
@@ -111,7 +111,7 @@ class twilio_responder_Public {
 		
 	public function incoming_message_logic($phone, $msg){
 		global $wpdb; 
-		error_log($msg);
+		
 		/** Twilio includes the country code **/
 		$phone = str_replace('+', '', $phone);
 		if( strlen($phone) === 11 ) $wp_phone = substr($phone, 1);
@@ -120,7 +120,7 @@ class twilio_responder_Public {
 		$ar_args   = array( 'billing_phone' => $phone );
 		$ar_orders = wc_get_orders( $ar_args );		
 	
-		if($ar_orders && !empty($ar_orders) )
+		if($ar_orders && !is_empty($ar_orders) )
 		{          
 			$order_id = $ar_orders[0]->get_id();        
 		} 
@@ -129,7 +129,7 @@ class twilio_responder_Public {
 			$ar_args = array( 'billing_phone' => $wp_phone );
 			$ar_orders = wc_get_orders( $ar_args );
 			if($ar_orders) $order_id = $ar_orders[0]->get_id();        
-		}		
+		}
 		
 		if(!$order_id) return 'No Order Found';
 		
